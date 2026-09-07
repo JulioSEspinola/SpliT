@@ -28,5 +28,6 @@ class GroupMember(Base):
     joined_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     group = relationship("Group", back_populates="members")
+    user = relationship("User")
 
     __table_args__ = (UniqueConstraint("group_id", "user_id", name="uq_group_user"),)
