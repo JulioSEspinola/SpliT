@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class GroupCreate(BaseModel):
@@ -22,6 +22,8 @@ class GroupOut(BaseModel):
 
 class GroupMemberOut(BaseModel):
     user_id: uuid.UUID
+    name: str
+    email: EmailStr
     joined_at: datetime
 
     class Config:
