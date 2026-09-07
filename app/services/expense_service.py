@@ -1,6 +1,7 @@
+import uuid
 from decimal import Decimal, ROUND_HALF_UP
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.core.idempotency import find_existing_expense_by_key
 from app.models.expense import Expense, ExpenseSplit, SplitType
@@ -10,6 +11,18 @@ from app.schemas.expense import ExpenseCreate
 
 class ExpenseValidationError(Exception):
     pass
+
+
+def list_group_expenses(db: Session, group_id: uuid.UUID, limit: int = 50, offset: int = 0) -> list[Expense]:
+    return (
+        db.query(Expense)
+        .options(joinedload(Expense.splits))
+        .filter(Expense.group_id == group_id, Expense.deleted_at.is_(None))
+        .order_by(Expense.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
 
 
 def create_expense(db: Session, payload: ExpenseCreate, idempotency_key: str | None = None) -> Expense:
